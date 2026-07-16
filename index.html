@@ -15,6 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <!-- Background ambient glowing blobs -->
     <div class="glow-container">
         <div class="glow-blob glow-1"></div>
@@ -38,7 +39,7 @@
                     <li><a href="#contact" class="nav-link">Contact</a></li>
                 </ul>
             </nav>
-            <button class="mobile-nav-toggle" aria-label="Toggle navigation menu" id="nav-toggle">
+            <button class="mobile-nav-toggle" aria-label="Open navigation menu" aria-controls="mobile-drawer" aria-expanded="false" id="nav-toggle">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="4" x2="20" y1="12" y2="12"></line>
                     <line x1="4" x2="20" y1="6" y2="6"></line>
@@ -49,7 +50,7 @@
     </header>
 
     <!-- Mobile Navigation Drawer -->
-    <div class="mobile-drawer" id="mobile-drawer">
+    <div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
         <div class="drawer-header">
             <span class="logo-text">&lt;MohammadAli.Dev&gt;</span>
             <button class="drawer-close" id="drawer-close" aria-label="Close menu">
@@ -70,7 +71,7 @@
     </div>
 
     <!-- Main Container -->
-    <main class="main-content">
+    <main class="main-content" id="main-content">
         <!-- Hero Section -->
         <section class="hero-section" id="hero">
             <div class="container hero-grid">
@@ -186,12 +187,13 @@
             <div class="container">
                 <div class="section-header">
                     <h2 class="section-title">Academic & Professional Work</h2>
-                    <p class="section-subtitle">A showcase of projects that link core backend scripting, graphical interfaces, and responsive web styling.</p>
+                    <p class="section-subtitle">Selected applications built across AI, computer vision, Flask, desktop GUIs, APIs, and MySQL-backed systems.</p>
                 </div>
 
                 <!-- Projects Filter -->
                 <div class="filter-container">
                     <button class="filter-btn active" data-filter="all">All Projects</button>
+                    <button class="filter-btn" data-filter="ai">AI & Computer Vision</button>
                     <button class="filter-btn" data-filter="pyapps">Python & GUIs</button>
                     <button class="filter-btn" data-filter="web">Web Development</button>
                     <button class="filter-btn" data-filter="design">Graphic Design</button>
@@ -199,6 +201,78 @@
 
                 <!-- Project Grid -->
                 <div class="grid projects-grid" id="projects-grid">
+                    <!-- Face Recognition Attendance -->
+                    <div class="project-card glass-panel" data-category="ai" id="project-attendance">
+                        <div class="project-banner cv-bg">
+                            <div class="project-badge">Computer Vision</div>
+                        </div>
+                        <div class="project-card-body">
+                            <h3 class="project-title">Face Recognition Attendance System</h3>
+                            <p class="project-text">Camera-based desktop application that registers faces, records entry and exit events, and stores attendance in CSV reports.</p>
+                            <div class="project-tags">
+                                <span class="tag">OpenCV</span>
+                                <span class="tag">Face Recognition</span>
+                                <span class="tag">Pandas</span>
+                                <span class="tag">Tkinter</span>
+                            </div>
+                            <button class="btn btn-card-details" onclick="openProjectModal('attendance')">View Architecture</button>
+                        </div>
+                    </div>
+
+                    <!-- Alis AI Chatbot -->
+                    <div class="project-card glass-panel" data-category="ai" id="project-alis-chatbot">
+                        <div class="project-banner chatbot-bg">
+                            <div class="project-badge">Generative AI</div>
+                        </div>
+                        <div class="project-card-body">
+                            <h3 class="project-title">Alis AI Web Chatbot</h3>
+                            <p class="project-text">Full-stack conversational assistant with a Flask JSON API, model integration, conversation history, and a theme-aware web interface.</p>
+                            <div class="project-tags">
+                                <span class="tag">Flask</span>
+                                <span class="tag">LLM API</span>
+                                <span class="tag">JavaScript</span>
+                                <span class="tag">REST</span>
+                            </div>
+                            <button class="btn btn-card-details" onclick="openProjectModal('alisChatbot')">View Architecture</button>
+                        </div>
+                    </div>
+
+                    <!-- Retail Billing Suite -->
+                    <div class="project-card glass-panel" data-category="pyapps" id="project-billing">
+                        <div class="project-banner billing-bg">
+                            <div class="project-badge">Database Desktop App</div>
+                        </div>
+                        <div class="project-card-body">
+                            <h3 class="project-title">MySQL Retail Billing Suite</h3>
+                            <p class="project-text">Tkinter billing system for customer and product management, cart totals, persisted invoices, receipt generation, and email delivery.</p>
+                            <div class="project-tags">
+                                <span class="tag">Python</span>
+                                <span class="tag">Tkinter</span>
+                                <span class="tag">MySQL</span>
+                                <span class="tag">SMTP</span>
+                            </div>
+                            <button class="btn btn-card-details" onclick="openProjectModal('billing')">View Architecture</button>
+                        </div>
+                    </div>
+
+                    <!-- Live News App -->
+                    <div class="project-card glass-panel" data-category="pyapps" id="project-news">
+                        <div class="project-banner news-bg">
+                            <div class="project-badge">API Integration</div>
+                        </div>
+                        <div class="project-card-body">
+                            <h3 class="project-title">Live News Desktop App</h3>
+                            <p class="project-text">Tkinter news reader that fetches remote articles, renders story images, supports article navigation, and opens full reports in the browser.</p>
+                            <div class="project-tags">
+                                <span class="tag">Requests</span>
+                                <span class="tag">News API</span>
+                                <span class="tag">Pillow</span>
+                                <span class="tag">Tkinter</span>
+                            </div>
+                            <button class="btn btn-card-details" onclick="openProjectModal('news')">View Architecture</button>
+                        </div>
+                    </div>
+
                     <!-- Project 1 -->
                     <div class="project-card glass-panel" data-category="pyapps" id="project-inventory">
                         <div class="project-banner genai-bg">
@@ -395,7 +469,7 @@
                         <div class="tags-group glass-panel">
                             <h3 class="col-title">Languages & Database</h3>
                             <div class="tags-container">
-                                <span class="skill-tag">Python</span>
+                                <span class="skill-tag">Python 3.11.9</span>
                                 <span class="skill-tag">JavaScript</span>
                                 <span class="skill-tag">SQL (MySQL)</span>
                             </div>
@@ -406,6 +480,10 @@
                             <div class="tags-container">
                                 <span class="skill-tag">NumPy</span>
                                 <span class="skill-tag">Pandas</span>
+                                <span class="skill-tag">OpenCV</span>
+                                <span class="skill-tag">Flask</span>
+                                <span class="skill-tag">REST APIs</span>
+                                <span class="skill-tag">Face Recognition</span>
                                 <span class="skill-tag">Tkinter GUI</span>
                                 <span class="skill-tag">HTML5</span>
                                 <span class="skill-tag">CSS3</span>
@@ -584,8 +662,8 @@
     </footer>
 
     <!-- Project Details Modals -->
-    <div class="modal-overlay" id="project-modal">
-        <div class="modal glass-panel">
+    <div class="modal-overlay" id="project-modal" aria-hidden="true">
+        <div class="modal glass-panel" role="dialog" aria-modal="true" aria-labelledby="project-modal-title">
             <button class="modal-close" onclick="closeProjectModal()" aria-label="Close modal">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" x2="6" y1="6" y2="18"></line>

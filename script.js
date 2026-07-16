@@ -30,15 +30,36 @@ function initMobileNav() {
     const mobileDrawer = document.getElementById('mobile-drawer');
     const drawerLinks = document.querySelectorAll('.drawer-link');
 
+    const openDrawer = () => {
+        if (!navToggle || !mobileDrawer) return;
+        mobileDrawer.classList.add('open');
+        mobileDrawer.setAttribute('aria-hidden', 'false');
+        navToggle.setAttribute('aria-expanded', 'true');
+        navToggle.setAttribute('aria-label', 'Close navigation menu');
+        document.body.classList.add('drawer-open');
+        drawerClose?.focus();
+    };
+
+    const closeDrawer = (returnFocus = true) => {
+        if (!navToggle || !mobileDrawer) return;
+        mobileDrawer.classList.remove('open');
+        mobileDrawer.setAttribute('aria-hidden', 'true');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.setAttribute('aria-label', 'Open navigation menu');
+        document.body.classList.remove('drawer-open');
+        if (returnFocus) navToggle.focus();
+    };
+
     if (navToggle && mobileDrawer) {
         navToggle.addEventListener('click', () => {
-            mobileDrawer.classList.add('open');
+            if (mobileDrawer.classList.contains('open')) closeDrawer();
+            else openDrawer();
         });
     }
 
     if (drawerClose && mobileDrawer) {
         drawerClose.addEventListener('click', () => {
-            mobileDrawer.classList.remove('open');
+            closeDrawer();
         });
     }
 
@@ -46,9 +67,21 @@ function initMobileNav() {
     drawerLinks.forEach(link => {
         link.addEventListener('click', () => {
             if (mobileDrawer) {
-                mobileDrawer.classList.remove('open');
+                closeDrawer(false);
             }
         });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && mobileDrawer?.classList.contains('open')) {
+            closeDrawer();
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768 && mobileDrawer?.classList.contains('open')) {
+            closeDrawer(false);
+        }
     });
 }
 
@@ -58,7 +91,7 @@ function initMobileNav() {
 
 const TERMINAL_SEQUENCE = [
     { type: 'input', text: 'mohammad_ali.init()' },
-    { type: 'output', text: 'Initializing environment: Python 3... [OK]\nLoading core libraries: NumPy, Pandas, Tkinter... [OK]\nConnecting database: MySQL daemon... [OK]\nSystem operational: v1.0.0-stable' },
+    { type: 'output', text: 'Initializing environment: Python 3.11.9... [OK]\nLoading core libraries: NumPy, Pandas, Tkinter... [OK]\nConnecting database: MySQL daemon... [OK]\nSystem operational: v1.0.0-stable' },
     { type: 'input', text: 'mohammad_ali.get_status()' },
     { type: 'output', text: 'Role: Python Developer (AI) & Graphic Designer\nInternship: Python Developer Intern @ Xipra Info Tech\nEducation: BCA @ HNGU (Ongoing)' },
     { type: 'input', text: 'mohammad_ali.get_skills()' },
@@ -237,6 +270,50 @@ const PROJECT_DATABASE = {
         ],
         nodes: ['Viewport Rules', 'Tailwind / CSS Grids', 'JS Event Hooks', 'Interactive DOM']
     },
+    attendance: {
+        category: 'AI & Computer Vision',
+        title: 'Face Recognition Attendance System',
+        desc: 'A Tkinter desktop application that uses a webcam and face encodings to register users, recognize known faces, and record timestamped entry and exit events in CSV attendance reports.',
+        impacts: [
+            '<strong>Face Enrollment:</strong> Captures a face from the webcam and saves it for future recognition against known encodings.',
+            '<strong>Attendance Workflow:</strong> Records entry and exit status with timestamps while preventing duplicate records in the attendance file.',
+            '<strong>Automated Alerts:</strong> Uses background checks and text-to-speech reminders when an expected exit event is missing.'
+        ],
+        nodes: ['Webcam Feed', 'Face Encoding', 'Identity Match', 'CSV Attendance']
+    },
+    alisChatbot: {
+        category: 'Generative AI & Web',
+        title: 'Alis AI Web Chatbot',
+        desc: 'A full-stack conversational assistant with a Flask backend, JSON chat endpoint, hosted language-model integration, retained conversation context, and a responsive browser interface.',
+        impacts: [
+            '<strong>Flask API:</strong> Exposes a POST chat route that accepts JSON messages and returns model responses to the frontend.',
+            '<strong>Conversation Context:</strong> Maintains user and assistant messages so replies remain aware of the active conversation.',
+            '<strong>Interactive Interface:</strong> Includes asynchronous message delivery, typing feedback, automatic scrolling, and a persistent light/dark theme.'
+        ],
+        nodes: ['Web Chat UI', 'Flask JSON Route', 'Conversation History', 'LLM API']
+    },
+    billing: {
+        category: 'Python, Tkinter & MySQL',
+        title: 'MySQL Retail Billing Suite',
+        desc: 'A multi-module desktop system for managing customers and products, building a shopping cart, calculating totals, saving invoices and line items, displaying receipts, and emailing bills.',
+        impacts: [
+            '<strong>Relational Data:</strong> Connects customer, product, bill, and bill-item records through parameterized MySQL operations.',
+            '<strong>Billing Workflow:</strong> Retrieves prices, calculates line totals and payable amounts, then saves complete invoices transactionally.',
+            '<strong>Business Tools:</strong> Provides CRUD screens, receipt presentation, customer lookup, product selection, and SMTP bill delivery.'
+        ],
+        nodes: ['Tkinter Modules', 'Customer & Product CRUD', 'Billing Engine', 'MySQL Records']
+    },
+    news: {
+        category: 'Python GUI & APIs',
+        title: 'Live News Desktop App',
+        desc: 'A Tkinter desktop news reader that requests article data from a remote API, downloads and resizes story images, navigates between reports, and opens source articles in the browser.',
+        impacts: [
+            '<strong>API Integration:</strong> Fetches and validates JSON article data with graceful handling for failed or empty responses.',
+            '<strong>Media Rendering:</strong> Loads remote images with Pillow and substitutes a fallback image when an article has no artwork.',
+            '<strong>Article Navigation:</strong> Builds previous, next, and read-more controls dynamically for the selected story.'
+        ],
+        nodes: ['News API', 'Requests / JSON', 'Pillow Rendering', 'Tkinter Reader']
+    },
     uvprint: {
         category: 'Graphic Design',
         title: 'Raahbar UV Vector Suite',
@@ -275,7 +352,7 @@ function openProjectModal(projectId) {
     modalContent.innerHTML = `
         <div class="modal-header">
             <div class="modal-category">${project.category}</div>
-            <h3 class="modal-title">${project.title}</h3>
+            <h3 class="modal-title" id="project-modal-title">${project.title}</h3>
         </div>
         <p class="modal-desc-text">${project.desc}</p>
         
@@ -293,13 +370,16 @@ function openProjectModal(projectId) {
     `;
 
     modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden'; // Lock background scrolling
+    modal.querySelector('.modal-close')?.focus();
 }
 
 function closeProjectModal() {
     const modal = document.getElementById('project-modal');
     if (modal) {
         modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
     }
     document.body.style.overflow = 'auto'; // Unlock background scrolling
 }
@@ -326,8 +406,8 @@ document.addEventListener('keydown', (e) => {
    ========================================================================== */
 
 const CHAT_DATABASE = {
-    projects: "Mohammad Ali has built several structured academic and professional projects:\n1. <strong>Tkinter Inventory Manager</strong>: Desktop GUI Python app linked with a MySQL database.\n2. <strong>NumPy & Pandas Analytics Kit</strong>: A terminal tool handling dataset cleaning and calculations.\n3. <strong>Responsive Portfolio Hub</strong>: A frontend showcase using CSS, JS, and Tailwind configurations.\n4. <strong>Raahbar UV Vector Suite</strong>: Print-ready high-precision graphics optimized for UV printers.",
-    skills: "My technical skill list comprises:\n• <strong>Scripting</strong>: Python (core logic, OOP), JavaScript.\n• <strong>Libraries</strong>: NumPy, Pandas, Tkinter (desktop windows).\n• <strong>Web Stack</strong>: HTML5, CSS3, Tailwind CSS, Bootstrap.\n• <strong>Databases</strong>: MySQL (relational schemas, optimized queries).\n• <strong>Design Tools</strong>: Photoshop, Canva, Git/GitHub for version tracking.",
+    projects: "Mohammad Ali has built several structured projects:\n1. <strong>Face Recognition Attendance System</strong>: OpenCV-based enrollment and timestamped entry/exit tracking.\n2. <strong>Alis AI Web Chatbot</strong>: Flask assistant with model integration and conversation history.\n3. <strong>MySQL Retail Billing Suite</strong>: Customer, product, invoice, receipt, and email workflows.\n4. <strong>Live News Desktop App</strong>: API-driven Tkinter reader with image rendering and article navigation.\n5. <strong>NumPy & Pandas Analytics Kit</strong>: Dataset cleaning and numerical analysis.\n6. <strong>Responsive Portfolio Hub</strong>: Responsive HTML, CSS, and JavaScript portfolio.",
+    skills: "My technical skill list comprises:\n• <strong>Scripting</strong>: Python 3.11.9, JavaScript, OOP.\n• <strong>AI & Data</strong>: OpenCV, face recognition, NumPy, Pandas.\n• <strong>Application Stack</strong>: Flask, REST APIs, Tkinter, HTML5, CSS3.\n• <strong>Databases</strong>: MySQL with relational CRUD and billing workflows.\n• <strong>Tools</strong>: Git/GitHub, Photoshop, Canva.",
     experience: "My professional timeline includes:\n• <strong>Python Developer Intern</strong> @ Xipra Info Tech (Nov 2024 - Present): Building Python applications, writing backend business logic, working with Tkinter GUIs, and MySQL queries.\n• <strong>Graphic Designer (Freelance)</strong> @ Raahbar UV Prints (2023 - 2024): UV flatbed print templates design, color alignment, client deliverables.",
     contact: "You can connect with Mohammad Ali Khanusiya via:\n• <strong>Phone</strong>: +91 94094 33440\n• <strong>Mail</strong>: khanusiyamoali@gmail.com\n• <strong>Address</strong>: Ayman 52, Ahmedabad, Gujarat\n• <strong>LinkedIn</strong>: <a href='http://www.linkedin.com/in/mohammad-ali-khanusiya-905a71293' target='_blank' style='color:#22c55e;'>linkedin.com/in/mohammad-ali-khanusiya-905a71293</a>",
     default: "Thank you for asking! I am Mohammad Ali's cyber replica. I can provide details on his Python internship at Xipra Info Tech, MySQL skills, Tkinter designs, HNGU BCA education, or contact details. Ask me about his projects, skills, or how to contact him!"
