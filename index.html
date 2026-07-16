@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohammad Ali Khanusiya | Python Developer (AI)</title>
+    <meta name="description" content="Portfolio of Mohammad Ali Khanusiya, Python Developer (AI) and Graphic Designer specializing in Python applications, Tkinter GUIs, MySQL, and full-stack web technologies.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Importing Inter & JetBrains Mono for modern developer layout -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Three.js for 3D model -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+</head>
+<body>
+    <!-- Background ambient glowing blobs -->
+    <div class="glow-container">
+        <div class="glow-blob glow-1"></div>
+        <div class="glow-blob glow-2"></div>
+        <div class="glow-blob glow-3"></div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="#" class="logo" id="header-logo">
+                <span class="accent">&lt;</span>MohammadAli<span class="accent">.Dev /&gt;</span>
+            </a>
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#projects" class="nav-link">Projects</a></li>
+                    <li><a href="#experience" class="nav-link">Experience</a></li>
+                    <li><a href="#skills" class="nav-link">Skills</a></li>
+                    <li><a href="#chat" class="nav-link nav-highlight">Ask My AI</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+            <button class="mobile-nav-toggle" aria-label="Toggle navigation menu" id="nav-toggle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" x2="20" y1="12" y2="12"></line>
+                    <line x1="4" x2="20" y1="6" y2="6"></line>
+                    <line x1="4" x2="20" y1="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-drawer" id="mobile-drawer">
+        <div class="drawer-header">
+            <span class="logo-text">&lt;MohammadAli.Dev&gt;</span>
+            <button class="drawer-close" id="drawer-close" aria-label="Close menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" x2="6" y1="6" y2="18"></line>
+                    <line x1="6" x2="18" y1="6" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <nav class="drawer-nav">
+            <a href="#about" class="drawer-link">About</a>
+            <a href="#projects" class="drawer-link">Projects</a>
+            <a href="#experience" class="drawer-link">Experience</a>
+            <a href="#skills" class="drawer-link">Skills</a>
+            <a href="#chat" class="drawer-link drawer-highlight">Ask My AI</a>
+            <a href="#contact" class="drawer-link">Contact</a>
+        </nav>
+    </div>
+
+    <!-- Main Container -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section" id="hero">
+            <div class="container hero-grid">
+                <div class="hero-text-content">
+                    <div class="badge-container">
+                        <span class="status-indicator"></span>
+                        <span class="badge-text">Seeking Opportunities</span>
+                    </div>
+                    <h1 class="hero-title">
+                        Mohammad Ali Khanusiya
+                    </h1>
+                    <h2 class="hero-subtitle">
+                        Python Developer (AI)
+                    </h2>
+                    <p class="hero-description">
+                        Motivated and detail-oriented Python Developer with hands-on experience building applications, designing desktop GUIs, managing MySQL databases, and writing clean, scalable script payloads.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#chat" class="btn btn-primary">
+                            <span>Chat with My AI</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        </a>
+                        <a href="#projects" class="btn btn-secondary">
+                            <span>Inspect Projects</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3D AI Neural Model -->
+                <div class="hero-3d glass-panel" id="hero-3d-panel">
+                    <canvas id="three-canvas"></canvas>
+                    <div class="model-badge">
+                        <span class="pulse-dot"></span>
+                        <span>Neural Engine · Live</span>
+                    </div>
+                    <div class="model-hint">Move cursor or scroll to interact</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Focus Areas Section -->
+        <section class="section section-dark" id="about">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Core Capability Areas</h2>
+                    <p class="section-subtitle">A balanced matrix of programming, backend systems, full-stack technologies, and visual design.</p>
+                </div>
+                <div class="grid focus-grid">
+                    <!-- Card 1 -->
+                    <div class="card glass-panel focus-card">
+                        <div class="card-icon-container circle-blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 18L22 12L16 6"></path>
+                                <path d="M8 6L2 12L8 18"></path>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Python Application Dev</h3>
+                        <p class="card-text">
+                            Developing desktop GUIs using Tkinter, handling clean data-driven pipelines with NumPy & Pandas, and automating background system scripts.
+                        </p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="card glass-panel focus-card">
+                        <div class="card-icon-container circle-green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                                <path d="M3 5V19A9 3 0 0 0 21 19V5"></path>
+                                <path d="M3 12A9 3 0 0 0 21 12"></path>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Database Integration</h3>
+                        <p class="card-text">
+                            Designing relational schemas and managing databases in MySQL. Writing optimized queries, table linkages, and secure application database layers.
+                        </p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="card glass-panel focus-card">
+                        <div class="card-icon-container circle-purple">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                <line x1="8" y1="21" x2="16" y2="21"></line>
+                                <line x1="12" y1="17" x2="12" y2="21"></line>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Full-Stack Web Dev</h3>
+                        <p class="card-text">
+                            Building clean frontends using HTML, CSS, Tailwind CSS, Bootstrap, and JavaScript to interface with robust backends and database structures.
+                        </p>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="card glass-panel focus-card">
+                        <div class="card-icon-container circle-orange">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"></path>
+                                <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Graphic & UV Design</h3>
+                        <p class="card-text">
+                            Creating visually stunning, print-ready designs for UV printing technology, ensuring precision alignment, color matching, and design layouts.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section class="section" id="projects">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Academic & Professional Work</h2>
+                    <p class="section-subtitle">A showcase of projects that link core backend scripting, graphical interfaces, and responsive web styling.</p>
+                </div>
+
+                <!-- Projects Filter -->
+                <div class="filter-container">
+                    <button class="filter-btn active" data-filter="all">All Projects</button>
+                    <button class="filter-btn" data-filter="pyapps">Python & GUIs</button>
+                    <button class="filter-btn" data-filter="web">Web Development</button>
+                    <button class="filter-btn" data-filter="design">Graphic Design</button>
+                </div>
+
+                <!-- Project Grid -->
+                <div class="grid projects-grid" id="projects-grid">
+                    <!-- Project 1 -->
+                    <div class="project-card glass-panel" data-category="pyapps" id="project-inventory">
+                        <div class="project-banner genai-bg">
+                            <div class="project-badge">Python / Tkinter</div>
+                        </div>
+                        <div class="project-card-body">
+                            <h3 class="project-title">Tkinter Inventory Manager</h3>
+                            <p class="project-text">Desktop GUI application integrating MySQL for secure, real-time tracking, data logging, and stock auditing.</p>
+                            <div class="project-tags">
+                                <span class="tag">Python</span>
+                                <span class="tag">Tkinter</span>
+                                <span class="tag">MySQL</span>
+                            </div>
+                            <button class="btn btn-card-details" onclick="openProjectModal('inventory')">View Architecture</button>
+                        </div>
+                    </div>
+
+                    <!-- Project 2 -->
+                    <div class="project-card glass-panel" data-category="pyapps" id="project-datakit">
+                        <div class="project-banner mlops-bg">
+                            <div class="project-badge">Data Tools</div>
+                        </div>
+                        <div class="project-card-body">
+                            <h3 class="project-title">NumPy & Pandas Analytics Kit</h3>
+                            <p class="project-text">Command-line toolkit developed to process tabular CSV records, extract statistical vectors, and filter files.</p>
+                            <div class="project-tags">
+                                <span class="tag">Python</span>
+                                <span class="tag">NumPy</span>
+                                <span class="tag">Pandas</span>
+                            </div>
+                            <button class="btn btn-card-details" onclick="openProjectModal('datakit')">View Architecture</button>
+                        </div>
+                    </div>
+
+                    <!-- Project 3 -->
+                    <div class="project-card glass-panel" data-category="web" id="project-portfolio">
+                        <div class="project-banner vision-bg">
+                            <div class="project-badge">Web Tech</div>
+                        </div>
+                        <div class="project-card-body">
+                            <h3 class="project-title">Responsive Portfolio Hub</h3>
+                            <p class="project-text">Sleek single-page portfolio layout developed with responsive grid parameters, styling utilities, and fluid DOM actions.</p>
+                            <div class="project-tags">
+                                <span class="tag">Tailwind CSS</span>
+                                <span class="tag">HTML5</span>
+                                <span class="tag">JavaScript</span>
+                            </div>
+                            <button class="btn btn-card-details" onclick="openProjectModal('portfolio')">View Architecture</button>
+                        </div>
+                    </div>
+
+                    <!-- Project 4 -->
+                    <div class="project-card glass-panel" data-category="design" id="project-uvprint">
+                        <div class="project-banner nlp-bg">
+                            <div class="project-badge">Design Graphics</div>
+                        </div>
+                        <div class="project-card-body">
+                            <h3 class="project-title">Raahbar UV Vector Suite</h3>
+                            <p class="project-text">A compilation of print-ready graphic templates engineered for high-resolution UV flatbed printer templates.</p>
+                            <div class="project-tags">
+                                <span class="tag">Photoshop</span>
+                                <span class="tag">Canva</span>
+                                <span class="tag">UV Precision</span>
+                            </div>
+                            <button class="btn btn-card-details" onclick="openProjectModal('uvprint')">View Architecture</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Timeline Section -->
+        <section class="section section-dark" id="experience">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Timeline of Experience</h2>
+                    <p class="section-subtitle">Bridging backend development internships with freelance graphical design pipelines.</p>
+                </div>
+
+                <div class="timeline">
+                    <!-- Experience Item 1 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker">
+                            <div class="marker-dot"></div>
+                        </div>
+                        <div class="timeline-content glass-panel">
+                            <div class="timeline-date">Nov 2024 - Present</div>
+                            <h3 class="timeline-role">Python Developer Intern</h3>
+                            <h4 class="timeline-company">Xipra Info Tech</h4>
+                            <p class="timeline-text">
+                                • Contributed to the design and development of Python-based applications.<br>
+                                • Gained hands-on experience working with backend system logic, data handling pipelines, and GUI construction using Tkinter.<br>
+                                • Collaborated closely with the team to optimize runtime code, fix memory leaks, and integrate MySQL databases.<br>
+                                • Assisted in debugging, testing, and improving application runtime efficiency.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Experience Item 2 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker">
+                            <div class="marker-dot"></div>
+                        </div>
+                        <div class="timeline-content glass-panel">
+                            <div class="timeline-date">2023 - 2024</div>
+                            <h3 class="timeline-role">Graphic Designer (Freelance)</h3>
+                            <h4 class="timeline-company">Raahbar UV Prints</h4>
+                            <p class="timeline-text">
+                                • Created visually appealing and print-ready designs optimized for UV printing technology, enhancing product appearance and quality.<br>
+                                • Collaborated with the production team to ensure accurate color matching and alignment for flawless print results.<br>
+                                • Managed multiple design projects simultaneously while meeting tight deadlines and client expectations to deliver high-impact marketing materials.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Education Item -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker">
+                            <div class="marker-dot"></div>
+                        </div>
+                        <div class="timeline-content glass-panel">
+                            <div class="timeline-date">2024 - Ongoing</div>
+                            <h3 class="timeline-role">Bachelor of Computer Application (BCA)</h3>
+                            <h4 class="timeline-company">Hemchandracharya North Gujarat University (HNGU), Patan</h4>
+                            <p class="timeline-text">
+                                Pursuing an academic foundation in computer science, software engineering, databases, algorithms, and application designs.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section class="section" id="skills">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Technical Skills</h2>
+                    <p class="section-subtitle">A technical mapping of programming proficiencies, database management, and design toolsets.</p>
+                </div>
+
+                <div class="skills-grid">
+                    <!-- Progress Skills -->
+                    <div class="skills-progress-col glass-panel">
+                        <h3 class="col-title">Core Proficiency Scale</h3>
+                        
+                        <!-- Skill 1 -->
+                        <div class="progress-bar-group">
+                            <div class="progress-label">
+                                <span>Python Programming & Scripting</span>
+                                <span class="progress-value">90%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 90%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Skill 2 -->
+                        <div class="progress-bar-group">
+                            <div class="progress-label">
+                                <span>Desktop GUIs (Tkinter) & Logic</span>
+                                <span class="progress-value">85%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Skill 3 -->
+                        <div class="progress-bar-group">
+                            <div class="progress-label">
+                                <span>Relational Databases (MySQL)</span>
+                                <span class="progress-value">80%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 80%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Skill 4 -->
+                        <div class="progress-bar-group">
+                            <div class="progress-label">
+                                <span>Frontend Styling (CSS / Tailwind / Bootstrap)</span>
+                                <span class="progress-value">75%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tag Skills -->
+                    <div class="skills-tags-col">
+                        <div class="tags-group glass-panel">
+                            <h3 class="col-title">Languages & Database</h3>
+                            <div class="tags-container">
+                                <span class="skill-tag">Python</span>
+                                <span class="skill-tag">JavaScript</span>
+                                <span class="skill-tag">SQL (MySQL)</span>
+                            </div>
+                        </div>
+
+                        <div class="tags-group glass-panel">
+                            <h3 class="col-title">Libraries & Web Stack</h3>
+                            <div class="tags-container">
+                                <span class="skill-tag">NumPy</span>
+                                <span class="skill-tag">Pandas</span>
+                                <span class="skill-tag">Tkinter GUI</span>
+                                <span class="skill-tag">HTML5</span>
+                                <span class="skill-tag">CSS3</span>
+                                <span class="skill-tag">Tailwind CSS</span>
+                                <span class="skill-tag">Bootstrap</span>
+                            </div>
+                        </div>
+
+                        <div class="tags-group glass-panel">
+                            <h3 class="col-title">Design & Toolkits</h3>
+                            <div class="tags-container">
+                                <span class="skill-tag">Git / GitHub</span>
+                                <span class="skill-tag">Photoshop</span>
+                                <span class="skill-tag">Canva</span>
+                                <span class="skill-tag">UV Layout Matching</span>
+                                <span class="skill-tag">Debugging Tools</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive AI Chatbot Simulator Section -->
+        <section class="section section-dark" id="chat">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Query My Assistant</h2>
+                    <p class="section-subtitle">An agentic double trained on my academic milestones, work logs, and skill capabilities.</p>
+                </div>
+
+                <div class="chatbot-container glass-panel">
+                    <!-- Chat Header -->
+                    <div class="chat-header">
+                        <div class="chat-avatar">
+                            <div class="avatar-inner">MA</div>
+                            <span class="active-status"></span>
+                        </div>
+                        <div class="chat-info">
+                            <h3 class="chat-title">Ali's Cyber Double</h3>
+                            <p class="chat-status">Autonomous Agentic Simulator</p>
+                        </div>
+                    </div>
+
+                    <!-- Chat Messages Area -->
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Message 1 -->
+                        <div class="msg msg-ai">
+                            <div class="msg-bubble">
+                                Hello! I'm Ali's Cyber Double, an agent trained to answer your questions about my education, internship, database skills, or freelance graphic design projects. Ask away!
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Options/Suggestions -->
+                    <div class="chat-suggestions">
+                        <button class="suggest-btn" onclick="sendSuggestedMessage('What did you do at Xipra Info Tech?')">What did you do at Xipra Info Tech?</button>
+                        <button class="suggest-btn" onclick="sendSuggestedMessage('Detail your graphic design experience.')">Detail your graphic design experience.</button>
+                        <button class="suggest-btn" onclick="sendSuggestedMessage('How can I contact Mohammad Ali?')">How can I contact Mohammad Ali?</button>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <form class="chat-input-form" id="chat-form">
+                        <input type="text" class="chat-input" id="chat-input" placeholder="Query Ali's background..." autocomplete="off" required>
+                        <button type="submit" class="chat-send-btn" aria-label="Send query">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="section" id="contact">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Initiate Handshake</h2>
+                    <p class="section-subtitle">Feel free to connect. Form endpoints match active routing logs.</p>
+                </div>
+
+                <div class="contact-wrapper">
+                    <div class="contact-grid">
+                        <!-- Left Info Panel -->
+                        <div class="contact-info-panel glass-panel">
+                            <h3 class="panel-heading">Direct Channels</h3>
+                            <p class="panel-desc">Preferred communication protocols for fast routing.</p>
+                            
+                            <ul class="contact-channels">
+                                <li>
+                                    <div class="channel-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                    </div>
+                                    <div class="channel-detail">
+                                        <span class="channel-label">Email</span>
+                                        <a href="mailto:khanusiyamoali@gmail.com" class="channel-value">khanusiyamoali@gmail.com</a>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="channel-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.5 12c0-5.799-4.701-10.5-10.5-10.5S1.5 6.201 1.5 12c0 5.237 3.829 9.582 8.859 10.37V14.63H7.625V12h2.734V9.997c0-2.697 1.605-4.188 4.062-4.188 1.176 0 2.406.21 2.406.21v2.643h-1.354c-1.336 0-1.753.828-1.753 1.677V12h2.977l-.476 2.63H13.72v7.74C18.721 21.582 22.5 17.237 22.5 12z" stroke-width="0.5" fill="currentColor"></path></svg>
+                                    </div>
+                                    <div class="channel-detail">
+                                        <span class="channel-label">Phone</span>
+                                        <a href="tel:+919409433440" class="channel-value">+91 94094 33440</a>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="channel-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                                    </div>
+                                    <div class="channel-detail">
+                                        <span class="channel-label">LinkedIn</span>
+                                        <a href="http://www.linkedin.com/in/mohammad-ali-khanusiya-905a71293" target="_blank" rel="noopener noreferrer" class="channel-value">linkedin.com/in/mohammad-ali...</a>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="channel-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"></path></svg>
+                                    </div>
+                                    <div class="channel-detail">
+                                        <span class="channel-label">Location Address</span>
+                                        <span class="channel-value">Ayman 52, Ahmedabad, Gujarat</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Right Form Panel -->
+                        <div class="contact-form-panel glass-panel">
+                            <form id="contact-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="form-name" class="form-label">Identifier (Name)</label>
+                                        <input type="text" id="form-name" class="form-control" placeholder="John Doe" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="form-email" class="form-label">Return Routing (Email)</label>
+                                        <input type="email" id="form-email" class="form-control" placeholder="john@company.com" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="form-subject" class="form-label">Subject Protocol</label>
+                                    <input type="text" id="form-subject" class="form-control" placeholder="Collaboration / Internship" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="form-message" class="form-label">Payload (Message)</label>
+                                    <textarea id="form-message" class="form-control" rows="5" placeholder="Describe the project parameters or open role..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block" id="form-submit-btn">
+                                    <span>Transmit Message</span>
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-left">
+                <span class="logo-text">&lt;MohammadAli.Dev&gt;</span>
+                <p class="footer-tagline">Engineered with precision. Backed by clean code.</p>
+            </div>
+            <div class="footer-right">
+                <p>&copy; 2026 Mohammad Ali Khanusiya. All rights reserved.</p>
+                <p class="api-status"><span class="pulse-indicator"></span> Core Services Operational</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Project Details Modals -->
+    <div class="modal-overlay" id="project-modal">
+        <div class="modal glass-panel">
+            <button class="modal-close" onclick="closeProjectModal()" aria-label="Close modal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" x2="6" y1="6" y2="18"></line>
+                    <line x1="6" x2="18" y1="6" y2="18"></line>
+                </svg>
+            </button>
+            <div class="modal-content" id="modal-content-area">
+                <!-- Injected dynamically based on selected project -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
