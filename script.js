@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileNav();
     initTerminal();
     initProjectFilters();
+    initBugHunter();
     initChatbot();
     initContactForm();
     initEntropy();
@@ -19,6 +20,412 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
+/* ==========================================================================
+   CODE RUNNER ENDLESS GAME
+   ========================================================================== */
+
+function initBugHunter() {
+    const canvas = document.getElementById('runner-canvas');
+    const stage = document.getElementById('runner-stage');
+    if (!canvas || !stage) return;
+
+    const ctx = canvas.getContext('2d');
+    const overlay = document.getElementById('runner-overlay');
+    const startButton = document.getElementById('runner-start');
+    const jumpButton = document.getElementById('runner-jump');
+    const scoreEl = document.getElementById('runner-score');
+    const bestEl = document.getElementById('runner-best');
+    const speedEl = document.getElementById('runner-speed');
+    const messageEl = document.getElementById('runner-message');
+    const instructionEl = document.getElementById('runner-instruction');
+    const statusEl = document.getElementById('runner-status');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let width = 900;
+    let height = 390;
+    let groundY = 320;
+    let dpr = 1;
+    let state = 'ready';
+    let score = 0;
+    let best = Number(localStorage.getItem('codeRunnerBest') || 0);
+    let speed = 6;
+    let spawnTimer = 80;
+    let tokenTimer = 180;
+    let lastTime = 0;
+    let animationId = 0;
+    let worldOffset = 0;
+    let obstacles = [];
+    let tokens = [];
+    let particles = [];
+    let skyline = [];
+    const player = { x: 92, y: 0, width: 46, height: 58, velocityY: 0, grounded: true, frame: 0 };
+
+    function formatScore(value) {
+        return String(Math.floor(value)).padStart(5, '0');
+    }
+
+    function resize() {
+        const rect = stage.getBoundingClientRect();
+        width = Math.max(300, Math.floor(rect.width));
+        height = Math.max(280, Math.floor(rect.height));
+        groundY = height - 65;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        if (player.grounded) player.y = groundY - player.height;
+        buildSkyline();
+        draw();
+    }
+
+    function buildSkyline() {
+        skyline = [];
+        let x = 0;
+        while (x < width + 120) {
+            const buildingWidth = 28 + Math.random() * 52;
+            skyline.push({ x, width: buildingWidth, height: 35 + Math.random() * 90 });
+            x += buildingWidth + 12;
+        }
+    }
+
+    function reset() {
+        score = 0;
+        speed = reduceMotion ? 5 : 6;
+        spawnTimer = 75;
+        tokenTimer = 150;
+        worldOffset = 0;
+        obstacles = [];
+        tokens = [];
+        particles = [];
+        player.y = groundY - player.height;
+        player.velocityY = 0;
+        player.grounded = true;
+        scoreEl.textContent = '00000';
+        speedEl.textContent = '1.0x';
+    }
+
+    function startGame() {
+        reset();
+        state = 'running';
+        overlay.classList.add('is-hidden');
+        jumpButton.classList.add('is-visible');
+        statusEl.textContent = 'Game started.';
+        lastTime = performance.now();
+        cancelAnimationFrame(animationId);
+        animationId = requestAnimationFrame(loop);
+    }
+
+    function jump() {
+        if (state === 'ready' || state === 'gameover') {
+            startGame();
+            return;
+        }
+        if (state === 'running' && player.grounded) {
+            player.velocityY = -14.5;
+            player.grounded = false;
+            createParticles(player.x + 18, groundY - 2, '#38bdf8', 6);
+        }
+    }
+
+    function spawnObstacle() {
+        const isBlock = Math.random() > 0.72;
+        obstacles.push({
+            x: width + 30,
+            y: isBlock ? groundY - 48 : groundY - 30,
+            width: isBlock ? 42 : 43,
+            height: isBlock ? 48 : 30,
+            type: isBlock ? 'error' : 'bug',
+            phase: Math.random() * Math.PI * 2
+        });
+        spawnTimer = Math.max(46, 92 - speed * 4) + Math.random() * 48;
+    }
+
+    function spawnToken() {
+        tokens.push({
+            x: width + 40,
+            y: groundY - 90 - Math.random() * 80,
+            radius: 13,
+            collected: false,
+            rotation: 0
+        });
+        tokenTimer = 150 + Math.random() * 130;
+    }
+
+    function createParticles(x, y, color, count) {
+        for (let i = 0; i < count; i++) {
+            particles.push({
+                x, y, color,
+                vx: (Math.random() - .5) * 4,
+                vy: -Math.random() * 3,
+                life: 1
+            });
+        }
+    }
+
+    function intersects(a, b, inset = 6) {
+        return a.x + inset < b.x + b.width - inset &&
+            a.x + a.width - inset > b.x + inset &&
+            a.y + inset < b.y + b.height - inset &&
+            a.y + a.height - inset > b.y + inset;
+    }
+
+    function endGame() {
+        state = 'gameover';
+        best = Math.max(best, Math.floor(score));
+        localStorage.setItem('codeRunnerBest', best);
+        bestEl.textContent = formatScore(best);
+        messageEl.textContent = 'Build crashed at ' + formatScore(score);
+        instructionEl.textContent = 'The bugs won this run. Ship a cleaner build.';
+        startButton.textContent = 'Run again';
+        overlay.classList.remove('is-hidden');
+        jumpButton.classList.remove('is-visible');
+        statusEl.textContent = 'Game over. Score ' + Math.floor(score) + '.';
+        createParticles(player.x + 24, player.y + 30, '#fb7185', 16);
+        draw();
+    }
+
+    function update(delta) {
+        const step = Math.min(delta / 16.67, 2);
+        score += .11 * speed * step;
+        speed = Math.min(12.5, (reduceMotion ? 5 : 6) + score / 420);
+        worldOffset = (worldOffset + speed * step) % 48;
+        scoreEl.textContent = formatScore(score);
+        speedEl.textContent = (speed / 6).toFixed(1) + 'x';
+
+        player.velocityY += .78 * step;
+        player.y += player.velocityY * step;
+        if (player.y >= groundY - player.height) {
+            player.y = groundY - player.height;
+            player.velocityY = 0;
+            player.grounded = true;
+        }
+        player.frame += step * speed * .04;
+
+        spawnTimer -= step;
+        tokenTimer -= step;
+        if (spawnTimer <= 0) spawnObstacle();
+        if (tokenTimer <= 0) spawnToken();
+
+        obstacles.forEach(obstacle => {
+            obstacle.x -= speed * step;
+            obstacle.phase += .15 * step;
+        });
+        tokens.forEach(token => {
+            token.x -= speed * step;
+            token.rotation += .08 * step;
+        });
+
+        const playerBox = { x: player.x, y: player.y, width: player.width, height: player.height };
+        for (const obstacle of obstacles) {
+            if (intersects(playerBox, obstacle, 8)) {
+                endGame();
+                return;
+            }
+        }
+
+        tokens.forEach(token => {
+            const tokenBox = { x: token.x - token.radius, y: token.y - token.radius, width: token.radius * 2, height: token.radius * 2 };
+            if (!token.collected && intersects(playerBox, tokenBox, 3)) {
+                token.collected = true;
+                score += 50;
+                createParticles(token.x, token.y, '#22c55e', 10);
+            }
+        });
+
+        particles.forEach(particle => {
+            particle.x += particle.vx * step;
+            particle.y += particle.vy * step;
+            particle.vy += .12 * step;
+            particle.life -= .035 * step;
+        });
+        obstacles = obstacles.filter(item => item.x + item.width > -30);
+        tokens = tokens.filter(item => !item.collected && item.x + item.radius > -20);
+        particles = particles.filter(item => item.life > 0);
+    }
+
+    function drawBackground() {
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, '#07101f');
+        gradient.addColorStop(1, '#0f1b2d');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.strokeStyle = 'rgba(56, 189, 248, .055)';
+        ctx.lineWidth = 1;
+        for (let x = -worldOffset; x < width; x += 48) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, groundY); ctx.stroke();
+        }
+        for (let y = 35; y < groundY; y += 48) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+        }
+
+        skyline.forEach((building, index) => {
+            const parallaxX = (building.x - worldOffset * .15 + width) % (width + 80) - 40;
+            ctx.fillStyle = 'rgba(15, 35, 55, .8)';
+            ctx.fillRect(parallaxX, groundY - building.height, building.width, building.height);
+            ctx.fillStyle = index % 3 === 0 ? 'rgba(34, 197, 94, .18)' : 'rgba(56, 189, 248, .13)';
+            for (let wy = groundY - building.height + 10; wy < groundY - 8; wy += 16) {
+                ctx.fillRect(parallaxX + 7, wy, 4, 4);
+                if (building.width > 38) ctx.fillRect(parallaxX + 20, wy, 4, 4);
+            }
+        });
+
+        ctx.fillStyle = '#13243a';
+        ctx.fillRect(0, groundY, width, height - groundY);
+        ctx.fillStyle = '#22c55e';
+        ctx.fillRect(0, groundY, width, 2);
+        ctx.strokeStyle = 'rgba(34, 197, 94, .2)';
+        ctx.setLineDash([18, 18]);
+        ctx.lineDashOffset = worldOffset;
+        ctx.beginPath(); ctx.moveTo(0, groundY + 28); ctx.lineTo(width, groundY + 28); ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    function drawPlayer() {
+        const x = player.x;
+        const y = player.y;
+        const bob = player.grounded ? Math.sin(player.frame * 2) * 1.5 : 0;
+        ctx.save();
+        ctx.translate(x, y + bob);
+
+        ctx.shadowColor = 'rgba(56, 189, 248, .45)';
+        ctx.shadowBlur = 14;
+        ctx.fillStyle = '#15263d';
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(7, 2, 33, 31, 8);
+        ctx.fill(); ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#07101f';
+        ctx.fillRect(13, 10, 21, 12);
+        ctx.fillStyle = '#22c55e';
+        ctx.fillRect(17, 14, 4, 4);
+        ctx.fillRect(27, 14, 4, 4);
+
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.roundRect(4, 32, 39, 17, 5);
+        ctx.fill();
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 11px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('</>', 23.5, 44);
+
+        const legOffset = player.grounded ? Math.sin(player.frame * 3) * 5 : 0;
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(15, 48); ctx.lineTo(13 + legOffset, 57); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(33, 48); ctx.lineTo(35 - legOffset, 57); ctx.stroke();
+        ctx.restore();
+    }
+
+    function drawBug(obstacle) {
+        ctx.save();
+        ctx.translate(obstacle.x, obstacle.y);
+        if (obstacle.type === 'error') {
+            ctx.shadowColor = 'rgba(251, 113, 133, .35)';
+            ctx.shadowBlur = 10;
+            ctx.fillStyle = '#351827';
+            ctx.strokeStyle = '#fb7185';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.roundRect(1, 1, obstacle.width - 2, obstacle.height - 2, 7); ctx.fill(); ctx.stroke();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#fb7185';
+            ctx.font = 'bold 21px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('!', obstacle.width / 2, 31);
+        } else {
+            const wiggle = Math.sin(obstacle.phase) * 2;
+            ctx.strokeStyle = '#fb7185';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            [[8, 4, 1, wiggle], [8, 14, 0, 16 + wiggle], [35, 4, 42, wiggle], [35, 14, 43, 16 + wiggle]].forEach(leg => {
+                ctx.beginPath(); ctx.moveTo(leg[0], leg[1] + 8); ctx.lineTo(leg[2], leg[3] + 8); ctx.stroke();
+            });
+            ctx.fillStyle = '#3b1726';
+            ctx.strokeStyle = '#fb7185';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.ellipse(21.5, 16, 15, 13, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#fecdd3';
+            ctx.fillRect(14, 11, 4, 4); ctx.fillRect(25, 11, 4, 4);
+        }
+        ctx.restore();
+    }
+
+    function drawToken(token) {
+        ctx.save();
+        ctx.translate(token.x, token.y);
+        ctx.scale(Math.max(.25, Math.abs(Math.cos(token.rotation))), 1);
+        ctx.shadowColor = 'rgba(34, 197, 94, .7)';
+        ctx.shadowBlur = 14;
+        ctx.fillStyle = '#123521';
+        ctx.strokeStyle = '#4ade80';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(0, 0, token.radius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#bbf7d0';
+        ctx.font = 'bold 13px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('✓', 0, 1);
+        ctx.restore();
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        drawBackground();
+        tokens.forEach(drawToken);
+        obstacles.forEach(drawBug);
+        drawPlayer();
+        particles.forEach(particle => {
+            ctx.globalAlpha = Math.max(0, particle.life);
+            ctx.fillStyle = particle.color;
+            ctx.fillRect(particle.x, particle.y, 3, 3);
+        });
+        ctx.globalAlpha = 1;
+    }
+
+    function loop(time) {
+        if (state !== 'running') return;
+        const delta = time - lastTime;
+        lastTime = time;
+        update(delta);
+        draw();
+        if (state === 'running') animationId = requestAnimationFrame(loop);
+    }
+
+    function handleControl(event) {
+        if (event.type === 'keydown' && !['Space', 'ArrowUp', 'KeyW'].includes(event.code)) return;
+        if (event.type === 'keydown' && ['INPUT', 'TEXTAREA', 'BUTTON'].includes(document.activeElement.tagName)) return;
+        event.preventDefault();
+        jump();
+    }
+
+    startButton.addEventListener('click', startGame);
+    jumpButton.addEventListener('click', jump);
+    canvas.addEventListener('pointerdown', handleControl);
+    document.addEventListener('keydown', handleControl);
+    window.addEventListener('resize', resize);
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && state === 'running') {
+            state = 'ready';
+            overlay.classList.remove('is-hidden');
+            jumpButton.classList.remove('is-visible');
+            messageEl.textContent = 'Run paused';
+            instructionEl.textContent = 'Your build is safe. Start again when ready.';
+            startButton.textContent = 'Restart run';
+        }
+    });
+
+    bestEl.textContent = formatScore(best);
+    resize();
+}
 
 /* ==========================================================================
    MOBILE NAVIGATION DRAWER
