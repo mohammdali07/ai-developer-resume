@@ -577,6 +577,8 @@ button {
     width: 100% !important;
     height: 100% !important;
     display: block;
+    z-index: 1;
+    transition: opacity 0.35s ease;
 }
 
 .model-badge {
@@ -967,6 +969,32 @@ button {
 }
 
 /* Animation classes for filtering */
+.projects-more {
+    display: flex;
+    justify-content: center;
+    margin-top: 36px;
+}
+
+.projects-more[hidden] {
+    display: none;
+}
+
+.projects-more-btn {
+    min-width: 220px;
+    gap: 10px;
+}
+
+.projects-more-btn svg {
+    transition: transform 0.25s ease;
+}
+
+.projects-more-btn.is-expanded svg {
+    transform: rotate(180deg);
+}
+
+.project-card[hidden] {
+    display: none !important;
+}
 .project-card.fade-out {
     animation: fadeOutCard 0.3s forwards cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1375,8 +1403,10 @@ button {
 }
 
 .contact-grid {
-    grid-template-columns: 0.8fr 1.2fr;
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
     gap: 32px;
+    align-items: start;
 }
 
 .contact-info-panel {

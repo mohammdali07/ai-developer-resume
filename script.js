@@ -11,12 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initContactForm();
     initEntropy();
     init3DEffects();
-    // Three.js needs the library; wait for it
+    // Three.js needs the library; wait for it.
     if (typeof THREE !== 'undefined') {
         initThreeModel();
     } else {
-        const s = document.querySelector('script[src*="three"]');
-        if (s) s.addEventListener('load', initThreeModel);
+        const threeScript = document.querySelector('script[src*="three"]');
+        if (threeScript) threeScript.addEventListener('load', initThreeModel, { once: true });
     }
 });
 
@@ -190,7 +190,7 @@ function initBugHunter() {
     function update(delta) {
         const step = Math.min(delta / 16.67, 2);
         score += .11 * speed * step;
-        speed = Math.min(12.5, (reduceMotion ? 5 : 6) + score / 420);
+        speed = Math.min(21.6, (reduceMotion ? 5 : 6) + score / 300);
         worldOffset = (worldOffset + speed * step) % 48;
         scoreEl.textContent = formatScore(score);
         speedEl.textContent = (speed / 6).toFixed(1) + 'x';
@@ -610,36 +610,52 @@ function appendCursor(container) {
 
 function initProjectFilters() {
     const filterButtons = document.querySelectorAll('.filter-btn');
-    const projectCards = document.querySelectorAll('.project-card');
+    const projectCards = Array.from(document.querySelectorAll('.project-card'));
+    const moreButton = document.getElementById('projects-more-btn');
+    const moreButtonLabel = moreButton ? moreButton.querySelector('span') : null;
+    const featuredLimit = 4;
+    let activeFilter = 'all';
+    let expanded = false;
+
+    function renderProjects(animate = false) {
+        projectCards.forEach((card, index) => {
+            const category = card.getAttribute('data-category');
+            const matchesFilter = activeFilter === 'all' || category === activeFilter;
+            const insideFeaturedLimit = activeFilter !== 'all' || expanded || index < featuredLimit;
+            const shouldShow = matchesFilter && insideFeaturedLimit;
+
+            card.hidden = !shouldShow;
+            card.classList.toggle('fade-in', shouldShow && animate);
+            card.classList.remove('fade-out');
+        });
+
+        if (!moreButton) return;
+        const extraCount = Math.max(0, projectCards.length - featuredLimit);
+        moreButton.parentElement.hidden = activeFilter !== 'all' || extraCount === 0;
+        moreButton.setAttribute('aria-expanded', String(expanded));
+        moreButton.classList.toggle('is-expanded', expanded);
+        moreButtonLabel.textContent = expanded
+            ? 'Show fewer projects'
+            : 'Show ' + extraCount + ' more projects';
+    }
 
     filterButtons.forEach(button => {
         button.addEventListener('click', () => {
-            // Remove active class
             filterButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
-
-            const filterValue = button.getAttribute('data-filter');
-
-            projectCards.forEach(card => {
-                const category = card.getAttribute('data-category');
-                
-                if (filterValue === 'all' || category === filterValue) {
-                    card.style.display = 'flex';
-                    card.classList.remove('fade-out');
-                    card.classList.add('fade-in');
-                } else {
-                    card.classList.remove('fade-in');
-                    card.classList.add('fade-out');
-                    // Sync display none after transition
-                    setTimeout(() => {
-                        if (card.classList.contains('fade-out')) {
-                            card.style.display = 'none';
-                        }
-                    }, 300);
-                }
-            });
+            activeFilter = button.getAttribute('data-filter');
+            renderProjects(true);
         });
     });
+
+    if (moreButton) {
+        moreButton.addEventListener('click', () => {
+            expanded = !expanded;
+            renderProjects(true);
+        });
+    }
+
+    renderProjects();
 }
 
 // Project Modal Database
@@ -1148,175 +1164,179 @@ function initThreeModel() {
     const canvas = document.getElementById('three-canvas');
     if (!panel || !canvas || typeof THREE === 'undefined') return;
 
-    const W = panel.offsetWidth || 480;
-    const H = panel.offsetHeight || 420;
-
-    // ── Renderer ────────────────────────────────────────────
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setSize(W, H);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setClearColor(0x000000, 0);
 
-    // ── Scene & Camera ──────────────────────────────────────
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(52, W / H, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 100);
     camera.position.z = 7;
 
-    // ── Main Group ──────────────────────────────────────────
-    const group = new THREE.Group();
-    scene.add(group);
+    const network = new THREE.Group();
+    scene.add(network);
 
-    // ── Core Icosahedron Wireframe ──────────────────────────
-    const coreGeo = new THREE.IcosahedronGeometry(1.4, 2);
-    const coreMat = new THREE.MeshBasicMaterial({
+    const coreMaterial = new THREE.MeshBasicMaterial({
         color: 0x22c55e,
         wireframe: true,
         transparent: true,
-        opacity: 0.35
+        opacity: 0.38
     });
-    const core = new THREE.Mesh(coreGeo, coreMat);
-    group.add(core);
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 2), coreMaterial);
+    network.add(core);
 
-    // Inner soft glow sphere
-    const glowGeo = new THREE.SphereGeometry(1.0, 24, 24);
-    const glowMat = new THREE.MeshBasicMaterial({
-        color: 0x22c55e,
-        transparent: true,
-        opacity: 0.04
-    });
-    group.add(new THREE.Mesh(glowGeo, glowMat));
+    const glow = new THREE.Mesh(
+        new THREE.SphereGeometry(1.05, 24, 24),
+        new THREE.MeshBasicMaterial({
+            color: 0x22c55e,
+            transparent: true,
+            opacity: 0.045,
+            depthWrite: false
+        })
+    );
+    network.add(glow);
 
-    // ── Orbital Nodes ────────────────────────────────────────
-    const NODE_COUNT = 72;
-    const nodePositions = [];
-    const nodeGeo = new THREE.SphereGeometry(0.055, 7, 7);
+    const nodeCount = 72;
+    const positions = [];
+    const nodeMeshes = [];
+    const palette = [0x22c55e, 0x38bdf8, 0xc084fc];
+    const materials = palette.map(color => new THREE.MeshBasicMaterial({ color }));
 
-    for (let i = 0; i < NODE_COUNT; i++) {
-        // Fibonacci sphere distribution
-        const phi   = Math.acos(1 - (2 * (i + 0.5)) / NODE_COUNT);
+    for (let i = 0; i < nodeCount; i++) {
+        const phi = Math.acos(1 - (2 * (i + 0.5)) / nodeCount);
         const theta = Math.PI * (1 + Math.sqrt(5)) * i;
-        const r     = 2.2 + (Math.random() - 0.5) * 0.7;
-        const pos   = new THREE.Vector3(
-            r * Math.sin(phi) * Math.cos(theta),
-            r * Math.sin(phi) * Math.sin(theta),
-            r * Math.cos(phi)
+        const radius = 2.2 + (Math.random() - 0.5) * 0.7;
+        const position = new THREE.Vector3(
+            radius * Math.sin(phi) * Math.cos(theta),
+            radius * Math.sin(phi) * Math.sin(theta),
+            radius * Math.cos(phi)
         );
-        nodePositions.push(pos);
+        positions.push(position);
 
-        // Alternate node colours: green / sky-blue / purple
-        const palette = [0x22c55e, 0x38bdf8, 0xc084fc];
-        const mat = new THREE.MeshBasicMaterial({ color: palette[i % 3] });
-        const mesh = new THREE.Mesh(nodeGeo, mat);
-        mesh.position.copy(pos);
-        group.add(mesh);
+        const node = new THREE.Mesh(
+            new THREE.SphereGeometry(0.055, 7, 7),
+            materials[i % materials.length]
+        );
+        node.position.copy(position);
+        node.userData.phase = i * 0.61;
+        nodeMeshes.push(node);
+        network.add(node);
     }
 
-    // ── Connection Lines (single merged geometry) ────────────
-    const lineVerts = [];
-    for (let i = 0; i < NODE_COUNT; i++) {
-        for (let j = i + 1; j < NODE_COUNT; j++) {
-            if (nodePositions[i].distanceTo(nodePositions[j]) < 1.6) {
-                lineVerts.push(
-                    nodePositions[i].x, nodePositions[i].y, nodePositions[i].z,
-                    nodePositions[j].x, nodePositions[j].y, nodePositions[j].z
+    const lineVertices = [];
+    for (let i = 0; i < nodeCount; i++) {
+        for (let j = i + 1; j < nodeCount; j++) {
+            if (positions[i].distanceTo(positions[j]) < 1.6) {
+                lineVertices.push(
+                    positions[i].x, positions[i].y, positions[i].z,
+                    positions[j].x, positions[j].y, positions[j].z
                 );
             }
         }
     }
-    const lineGeo = new THREE.BufferGeometry();
-    lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(lineVerts, 3));
-    const lineMat = new THREE.LineBasicMaterial({
-        color: 0x38bdf8,
-        transparent: true,
-        opacity: 0.22
-    });
-    group.add(new THREE.LineSegments(lineGeo, lineMat));
+    const lineGeometry = new THREE.BufferGeometry();
+    lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(lineVertices, 3));
+    network.add(new THREE.LineSegments(
+        lineGeometry,
+        new THREE.LineBasicMaterial({
+            color: 0x38bdf8,
+            transparent: true,
+            opacity: 0.22,
+            depthWrite: false
+        })
+    ));
 
-    // ── Ambient Floating Particles ──────────────────────────
-    const PART = 280;
-    const partPos = new Float32Array(PART * 3);
-    for (let i = 0; i < PART * 3; i++) partPos[i] = (Math.random() - 0.5) * 12;
-    const partGeo = new THREE.BufferGeometry();
-    partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
-    const partMat = new THREE.PointsMaterial({
-        color: 0xffffff,
-        size: 0.028,
-        transparent: true,
-        opacity: 0.35
-    });
-    scene.add(new THREE.Points(partGeo, partMat));
-
-    // ── Outer Ring ──────────────────────────────────────────
-    const ringGeo = new THREE.TorusGeometry(2.8, 0.012, 8, 120);
-    const ringMat = new THREE.MeshBasicMaterial({
-        color: 0x22c55e,
-        transparent: true,
-        opacity: 0.18
-    });
-    const ring = new THREE.Mesh(ringGeo, ringMat);
+    const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(2.8, 0.012, 8, 120),
+        new THREE.MeshBasicMaterial({
+            color: 0x22c55e,
+            transparent: true,
+            opacity: 0.18,
+            depthWrite: false
+        })
+    );
     ring.rotation.x = Math.PI / 3;
-    group.add(ring);
+    network.add(ring);
 
     const ring2 = new THREE.Mesh(
         new THREE.TorusGeometry(3.1, 0.008, 8, 120),
-        new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.1 })
+        new THREE.MeshBasicMaterial({
+            color: 0x38bdf8,
+            transparent: true,
+            opacity: 0.1,
+            depthWrite: false
+        })
     );
     ring2.rotation.x = -Math.PI / 4;
     ring2.rotation.y = Math.PI / 6;
-    group.add(ring2);
+    network.add(ring2);
 
-    // ── Mouse / Cursor Tracking ─────────────────────────────
-    let mouseX = 0, mouseY = 0;
-    let targetRotX = 0, targetRotY = 0;
-    let scrollRot = window.scrollY * 0.0025;
-    let targetScrollRot = scrollRot;
+    const particleCount = 280;
+    const particlePositions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particlePositions.length; i++) {
+        particlePositions[i] = (Math.random() - 0.5) * 12;
+    }
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+    const particles = new THREE.Points(
+        particleGeometry,
+        new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 0.028,
+            transparent: true,
+            opacity: 0.35,
+            depthWrite: false
+        })
+    );
+    scene.add(particles);
 
-    window.addEventListener('mousemove', (e) => {
-        mouseX =  (e.clientX / window.innerWidth  - 0.5) * 2;
-        mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
-    });
+    let pointerX = 0;
+    let pointerY = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let scrollRotation = window.scrollY * 0.0025;
 
+    window.addEventListener('pointermove', event => {
+        pointerX = (event.clientX / window.innerWidth - 0.5) * 2;
+        pointerY = -(event.clientY / window.innerHeight - 0.5) * 2;
+    }, { passive: true });
     window.addEventListener('scroll', () => {
-        targetScrollRot = window.scrollY * 0.0025;
+        scrollRotation = window.scrollY * 0.0025;
     }, { passive: true });
 
-    // ── Animation Loop ───────────────────────────────────────
-    let t = 0;
-    (function animate() {
-        requestAnimationFrame(animate);
-        t += 0.006;
-
-        // Smooth lerp toward cursor
-        targetRotY += (mouseX * 2.2 - targetRotY) * 0.045;
-        targetRotX += (mouseY * 1.1 - targetRotX) * 0.045;
-        scrollRot += (targetScrollRot - scrollRot) * 0.08;
-
-        group.rotation.y = targetRotY + scrollRot + t * 0.18;
-        group.rotation.x = targetRotX + Math.sin(scrollRot * 0.55) * 0.18
-            + Math.sin(t * 0.4) * 0.06;
-
-        // Pulsing core
-        const pulse = 1 + Math.sin(t * 1.8) * 0.03;
-        core.scale.set(pulse, pulse, pulse);
-        coreMat.opacity = 0.28 + Math.sin(t) * 0.1;
-
-        // Slow ring rotation
-        ring.rotation.z  += 0.003;
-        ring2.rotation.z -= 0.002;
-
-        renderer.render(scene, camera);
-    })();
-
-    // ── Resize ──────────────────────────────────────────────
-    window.addEventListener('resize', () => {
-        const w = panel.offsetWidth;
-        const h = panel.offsetHeight;
-        camera.aspect = w / h;
+    function resizeNetwork() {
+        const width = panel.clientWidth || 480;
+        const height = panel.clientHeight || 420;
+        camera.aspect = width / height;
         camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
-    });
-}
+        renderer.setSize(width, height, false);
+        network.scale.setScalar(width < 420 ? 0.88 : 1);
+    }
 
+    let time = 0;
+    function animateNetwork() {
+        requestAnimationFrame(animateNetwork);
+        time += 0.006;
+        targetY += (pointerX * 1.8 - targetY) * 0.045;
+        targetX += (pointerY * 0.9 - targetX) * 0.045;
+
+        network.rotation.y = targetY + scrollRotation + time * 0.18;
+        network.rotation.x = targetX + Math.sin(time * 0.4) * 0.06;
+        const pulse = 1 + Math.sin(time * 1.8) * 0.03;
+        core.scale.setScalar(pulse);
+        coreMaterial.opacity = 0.3 + Math.sin(time) * 0.08;
+        ring.rotation.z += 0.003;
+        ring2.rotation.z -= 0.002;
+        nodeMeshes.forEach((node, index) => {
+            node.scale.setScalar(1 + Math.sin(time * 2 + node.userData.phase) * 0.1);
+        });
+        particles.rotation.y = time * 0.012;
+        renderer.render(scene, camera);
+    }
+
+    resizeNetwork();
+    window.addEventListener('resize', resizeNetwork);
+    animateNetwork();
+}
 
 /* ==========================================================================
    3D CARD TILT + CURSOR GLOW
