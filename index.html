@@ -82,39 +82,33 @@
                         <span class="status-indicator"></span>
                         <span class="badge-text">Seeking Opportunities</span>
                     </div>
-                    <h1 class="hero-title">
-                        Mohammad Ali Khanusiya
-                    </h1>
-                    <h2 class="hero-subtitle">
-                        Python Developer (AI)
-                    </h2>
+                    <h1 class="hero-title">Mohammad Ali Khanusiya</h1>
+                    <h2 class="hero-subtitle">Python Developer (AI)</h2>
                     <p class="hero-description">
                         Motivated and detail-oriented Python Developer with hands-on experience building applications, designing desktop GUIs, managing MySQL databases, and writing clean, scalable script payloads.
                     </p>
                     <div class="hero-actions">
                         <a href="#chat" class="btn btn-primary">
                             <span>Chat with My AI</span>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                         </a>
                         <a href="#projects" class="btn btn-secondary">
                             <span>Inspect Projects</span>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </a>
                     </div>
                 </div>
 
-                <!-- 3D AI Neural Model -->
                 <div class="hero-3d glass-panel" id="hero-3d-panel">
-                    <canvas id="three-canvas"></canvas>
+                    <canvas id="three-canvas" aria-label="Interactive circular neural network model"></canvas>
                     <div class="model-badge">
                         <span class="pulse-dot"></span>
-                        <span>Neural Engine · Live</span>
+                        <span>Neural Engine &middot; Live</span>
                     </div>
                     <div class="model-hint">Move cursor or scroll to interact</div>
                 </div>
             </div>
         </section>
-
         <!-- Focus Areas Section -->
         <section class="section section-dark" id="about">
             <div class="container">
@@ -342,6 +336,14 @@
                             <button class="btn btn-card-details" onclick="openProjectModal('uvprint')">View Architecture</button>
                         </div>
                     </div>
+                </div>
+                <div class="projects-more">
+                    <button class="btn btn-secondary projects-more-btn" id="projects-more-btn" type="button" aria-expanded="false" aria-controls="projects-grid">
+                        <span>Show 4 more projects</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="m6 9 6 6 6-6"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </section>
